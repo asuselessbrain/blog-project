@@ -61,8 +61,30 @@ const getSingleUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const user = req.body;
+    const userID = req.params.id;
+
+    const result = await userServices.updateUserInDB(userID, user);
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      user: result,
+    });
+  } catch (err) {
+    const error = err as Error;
+    res.status(500).json({
+      success: false,
+      errorMessage: error.message,
+      error: error,
+    });
+  }
+};
 export const userController = {
   createUser,
   getAllUser,
   getSingleUser,
+  updateUser,
 };
