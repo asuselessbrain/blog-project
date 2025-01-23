@@ -1,36 +1,34 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { userServices } from './user.services';
 import { userValidationSchema } from './user.validation';
+import { StatusCodes } from 'http-status-codes';
+import responser from '../../utils/sendResponse';
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.body;
 
     const zodData = userValidationSchema.parse(user);
 
-    const responser = await userServices.createUserInDB(zodData);
+    const response = await userServices.createUserInDB(zodData);
 
-    res.status(200).json({
+    responser(res, {
+      statusCode: StatusCodes.CREATED,
       message: 'User created successfully',
-      user: responser,
+      data: response,
     });
   } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      message: 'Error creating user',
-      errorMessage: error.message,
-      error: error,
-    });
+    next(err);
   }
 };
 
 const getAllUser = async (req: Request, res: Response) => {
   try {
     const users = await userServices.getUserFromDB();
-    res.status(200).json({
-      success: true,
+    responser(res, {
+      statusCode: StatusCodes.OK,
       message: 'Users fetched successfully',
-      users,
+      data: users,
     });
   } catch (err) {
     const error = err as Error;
@@ -47,10 +45,10 @@ const getSingleUser = async (req: Request, res: Response) => {
     const userID = req.params.id;
 
     const user = await userServices.setSingleUserFromDB(userID);
-    res.status(200).json({
-      success: true,
-      message: 'User fetched successfully',
-      user,
+    responser(res, {
+      statusCode: StatusCodes.OK,
+      message: 'Users fetched successfully',
+      data: user,
     });
   } catch (err) {
     const error = err as Error;
@@ -68,10 +66,10 @@ const updateUser = async (req: Request, res: Response) => {
     const userID = req.params.id;
 
     const result = await userServices.updateUserInDB(userID, user);
-    res.status(200).json({
-      success: true,
+    responser(res, {
+      statusCode: StatusCodes.CREATED,
       message: 'User updated successfully',
-      user: result,
+      data: result,
     });
   } catch (err) {
     const error = err as Error;
@@ -89,10 +87,10 @@ const deleteUser = async (req: Request, res: Response) => {
 
     const result = await userServices.deleteUserFromDB(userID);
 
-    res.status(200).json({
-      success: true,
+    responser(res, {
+      statusCode: StatusCodes.NO_CONTENT,
       message: 'User deleted successfully',
-      user: result,
+      data: result,
     });
   } catch (err) {
     const error = err as Error;
