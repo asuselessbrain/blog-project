@@ -5,4 +5,4 @@ const userRoute = Router();
 
 userRoute.post('/create-user', userController.createUser);
 
-export default userRoute
+export default userRoute;
