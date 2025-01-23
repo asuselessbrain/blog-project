@@ -20,6 +20,8 @@ const createBlog = async (req: Request, res: Response) => {
   }
 };
 
+// const getAllBlog;
+
 export const blogController = {
   createBlog,
 };
