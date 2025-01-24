@@ -3,26 +3,23 @@ import { userServices } from './user.services';
 import { userValidationSchema } from './user.validation';
 import { StatusCodes } from 'http-status-codes';
 import responser from '../../utils/sendResponse';
+import { catchAsync } from '../../utils/catchAsync';
 
-const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = req.body;
+const createUser = catchAsync(async (req: Request, res: Response) => {
+  const user = req.body;
 
-    const zodData = userValidationSchema.parse(user);
+  const zodData = userValidationSchema.parse(user);
 
-    const response = await userServices.createUserInDB(zodData);
+  const response = await userServices.createUserInDB(zodData);
 
-    responser(res, {
-      statusCode: StatusCodes.CREATED,
-      message: 'User created successfully',
-      data: response,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+  responser(res, {
+    statusCode: StatusCodes.CREATED,
+    message: 'User created successfully',
+    data: response,
+  });
+});
 
-const getAllUser = async (req: Request, res: Response) => {
+const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await userServices.getUserFromDB();
     responser(res, {
@@ -31,16 +28,15 @@ const getAllUser = async (req: Request, res: Response) => {
       data: users,
     });
   } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      success: false,
-      errorMessage: error.message,
-      error: error,
-    });
+    next(err);
   }
 };
 
-const getSingleUser = async (req: Request, res: Response) => {
+const getSingleUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userID = req.params.id;
 
@@ -51,16 +47,11 @@ const getSingleUser = async (req: Request, res: Response) => {
       data: user,
     });
   } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      success: false,
-      errorMessage: error.message,
-      error: error,
-    });
+    next(err);
   }
 };
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.body;
     const userID = req.params.id;
@@ -72,16 +63,11 @@ const updateUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      success: false,
-      errorMessage: error.message,
-      error: error,
-    });
+    next(err);
   }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userID = req.params.id;
 
@@ -93,12 +79,7 @@ const deleteUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      success: false,
-      errorMessage: error.message,
-      error: error,
-    });
+    next(err);
   }
 };
 export const userController = {
