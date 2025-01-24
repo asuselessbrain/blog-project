@@ -3,11 +3,14 @@ import { blogServices } from './blog.services';
 import responser from '../../utils/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import { catchAsync } from '../../utils/catchAsync';
+import blogValidationSchema from './blog.validation';
 
 const createBlog = catchAsync(async (req: Request, res: Response) => {
   const blog = req.body;
 
-  const result = await blogServices.createBlogInDB(blog);
+  const zodValidator = blogValidationSchema.parse(blog);
+
+  const result = await blogServices.createBlogInDB(zodValidator);
 
   responser(res, {
     statusCode: StatusCodes.CREATED,
