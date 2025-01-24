@@ -1,96 +1,63 @@
 import { Request, Response } from 'express';
 import { blogServices } from './blog.services';
+import responser from '../../utils/sendResponse';
+import { StatusCodes } from 'http-status-codes';
+import { catchAsync } from '../../utils/catchAsync';
 
-const createBlog = async (req: Request, res: Response) => {
-  try {
-    const blog = req.body;
+const createBlog = catchAsync(async (req: Request, res: Response) => {
+  const blog = req.body;
 
-    const result = await blogServices.createBlogInDB(blog);
+  const result = await blogServices.createBlogInDB(blog);
 
-    res.status(200).json({
-      message: 'Blog created successfully',
-      blog: result,
-    });
-  } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      errorMessage: error.message,
-      error: err,
-    });
-  }
-};
+  responser(res, {
+    statusCode: StatusCodes.CREATED,
+    message: 'Blog created successfully',
+    data: result,
+  });
+});
 
-const getAllBlog = async (req: Request, res: Response) => {
-  try {
-    const blog = await blogServices.getAllBlogFromDB();
-    res.status(200).json({
-      message: 'All blogs',
-      blog: blog,
-    });
-  } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      errorMessage: error.message,
-      error: err,
-    });
-  }
-};
+const getAllBlog = catchAsync(async (req: Request, res: Response) => {
+  const blog = await blogServices.getAllBlogFromDB();
+  responser(res, {
+    statusCode: StatusCodes.OK,
+    message: 'Blog fetched successfully',
+    data: blog,
+  });
+});
 
-const getSingleBlog = async (req: Request, res: Response) => {
-  try {
-    const blogID = req.params.id;
-    const result = await blogServices.getSingleBlogFromDB(blogID);
-    res.status(200).json({
-      message: 'Single blog',
-      blog: result,
-    });
-  } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      errorMessage: error.message,
-      error: err,
-    });
-  }
-};
+const getSingleBlog = catchAsync(async (req: Request, res: Response) => {
+  const blogID = req.params.id;
+  const result = await blogServices.getSingleBlogFromDB(blogID);
+  responser(res, {
+    statusCode: StatusCodes.OK,
+    message: 'Blog fetched successfully',
+    data: result,
+  });
+});
 
-const updateBlog = async (req: Request, res: Response) => {
-  try {
-    const blogID = req.params.id;
-    const blog = req.body;
+const updateBlog = catchAsync(async (req: Request, res: Response) => {
+  const blogID = req.params.id;
+  const blog = req.body;
 
-    const result = await blogServices.updateBlogInDB(blog, blogID);
+  const result = await blogServices.updateBlogInDB(blog, blogID);
 
-    res.status(200).json({
-      message: 'Blog updated successfully',
-      blog: result,
-    });
-  } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      errorMessage: error.message,
-      error: err,
-    });
-  }
-};
+  responser(res, {
+    statusCode: StatusCodes.OK,
+    message: 'Blog updated successfully',
+    data: result,
+  });
+});
 
-const deleteBlog = async (req: Request, res: Response) => {
-  try {
-    const blogID = req.params.id;
-    const result = await blogServices.deleteBlogFromDB(blogID);
+const deleteBlog = catchAsync(async (req: Request, res: Response) => {
+  const blogID = req.params.id;
+  const result = await blogServices.deleteBlogFromDB(blogID);
 
-    res.status(200).json({
-      success: true,
-      message: 'Blog deleted successfully',
-      blog: result,
-    });
-  } catch (err) {
-    const error = err as Error;
-    res.status(500).json({
-      errorMessage: error.message,
-      error: err,
-    });
-  }
-};
+  responser(res, {
+    statusCode: StatusCodes.OK,
+    message: 'Blog deleted successfully',
+    data: result,
+  });
+});
 
 export const blogController = {
   createBlog,
